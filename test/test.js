@@ -15,7 +15,7 @@ const encrypt_secret_to_many = {
      session = keyring:session(pub)
      iv = RNG.new():octet(16)
      out = { header = "encoded using zenroom " .. VERSION}
-     out.text, out.checksum = 
+     out.text, out.checksum =
       ECDH.aead_encrypt(session, secret, iv, out.header)
      res[name] = str( MSG.pack( map(out,base64) ) ):base64()
   end
@@ -56,28 +56,28 @@ describe('Zenroom module', function () {
     assert(zenroom)
   })
 
-  it('should zenroom have exposed all public method', function () {
+  it('should expose all public methods', function () {
     const z = zenroom.init()
     expect(z).to.be.an('object').to.have.all.keys('conf data zenroom_exec zencode_exec error init keys print success verbosity script __debug reset'.split(' '))
   })
 
-  it('should zenroom initialize script', function () {
+  it('should initialize script', function () {
     const z = zenroom.init({ script: 'print("hello")' })
     expect(console.log.called).to.be.false
   })
 
-  it('should zenroom exec script', function () {
+  it('should exec script', function () {
     const z = zenroom.script('print("one script")').zenroom_exec()
     expect(z).to.be.an('object')
     expect(console.log.calledWithExactly('one script')).to.be.true
   })
 
-  it('should zenroom execute script with init', function () {
+  it('should execute script with init', function () {
     zenroom.init({ script: 'print("exec with init")' }).zenroom_exec()
     expect(console.log.calledOnce).to.be.true
   })
 
-  it('should zenroom execute correctly with data and keys', function () {
+  it('should execute correctly with data and keys', function () {
     zenroom
       .script(encrypt_secret_to_many.script)
       .keys(encrypt_secret_to_many.keys)
@@ -88,25 +88,25 @@ describe('Zenroom module', function () {
     expect(console.log.calledOnce).to.be.true
   })
 
-  it('should script method work correctly', function () {
+  it('should have script method working correctly', function () {
     const script = 'print("hello")'
     const options = zenroom.script(script).__debug()
     expect(options.script).to.be.equal(script)
   })
 
-  it('should conf method work correctly', function () {
+  it('should have conf method working correctly', function () {
     const conf = 'this monday is super monday'
     const options = zenroom.conf(conf).__debug()
     expect(options.conf).to.be.equal(conf)
   })
 
-  it('should data method work correctly', function () {
+  it('should have data method working correctly', function () {
     const data = 'This is my DATA'
     const options = zenroom.data(data).__debug()
     expect(options.data).to.be.equal(data)
   })
 
-  it('should keys method work correctly', function () {
+  it('should have keys method working correctly', function () {
     const keys = { a: 1, b: 2 }
     const options = zenroom.keys(keys).__debug()
     const keysResult = JSON.parse(options.keys)
@@ -114,7 +114,7 @@ describe('Zenroom module', function () {
     expect(keysResult).to.include(keys)
   })
 
-  it('should verbosity method work correctly', function () {
+  it('should have verbosity method working correctly', function () {
     const options = zenroom.verbosity(2).__debug()
     expect(options.verbosity).to.be.equal(2)
   })
@@ -167,7 +167,7 @@ describe('Zenroom module', function () {
     -- generate a simple keyring
     keyring = ECDH.new()
     keyring:keygen()
-    
+
     -- export the keypair to json
     export = JSON.encode(
        {
@@ -182,7 +182,7 @@ describe('Zenroom module', function () {
     expect(result).to.have.all.keys('public private'.split(' '))
   })
 
-  it(`sohuld create correct keygen with zencode`, () => {
+  it(`should create correct keygen with zencode`, () => {
     const zencode = `
     Scenario 'coconut': "To run over the mobile wallet the first time and store the output as keypair.keys"
     Given that I am known as 'identifier'
@@ -195,14 +195,14 @@ describe('Zenroom module', function () {
     expect(result.identifier).to.have.all.keys('public private curve encoding schema zenroom'.split(' '))
   })
 
-  it(`should broke whith a broken zencode`, () => {
+  it(`should break with broken zencode`, () => {
     zenroom.script(`apokspoas`).zencode_exec()
     const result = console.log.args[0][0]
     expect(console.log.called).to.be.true
     expect(result).to.be.equal('[W] Zencode text too short to parse')
   })
 
-  it(`should broke whith a broken zencode and call the error callback`, () => {
+  it(`should break with broken zencode and call the error callback`, () => {
     let errorExecuted = false
     zenroom.init({
       script: 'broken script on purpose',
